@@ -1,0 +1,80 @@
+## Title : m0609_task_20241213_173930
+## Time : 2024-12-13 18:24:38
+Global_pos1 = posx(348.18,99.64,118.35,86.80,179.94,86.40)
+Global_pos2 = posx(450.84,95.27,118.35,19.73,179.64,19.31)
+Global_pos3 = posx(451.89,-7.61,118.35,19.73,179.64,19.31)
+Global_pos4 = posx(347.89,-7.61,118.35,19.75,179.64,19.33)
+
+set_singular_handling(DR_AVOID)
+set_velj(600.0)
+set_accj(4000.0)
+set_velx(2500.0, 80.625)
+set_accx(4000.0, 322.5)
+
+def grasp():
+    # SetNode
+    set_digital_output(1,ON)
+    # SetNode
+    set_digital_output(2,OFF)
+    # WaitNode
+    wait(2.50)
+
+def release():
+    # SetNode
+    set_digital_output(1,OFF)
+    # SetNode
+    set_digital_output(2,ON)
+    # WaitNode
+    wait(1.50)
+
+
+gLoop182438950 = 0
+while gLoop182438950 < 1:
+    # Example Data
+    direction = 0 # Normal Pallet -> 0: Snake, 1: Zigzag / Rhombus Pallet -> 2: Snake, 3: Zigzag
+    row = 3
+    column = 3
+    stack = 1
+    thickness = 0
+    point_offset = [0, 0, 0] # Offset for calculated pose
+
+    # Total count
+    if direction < 2: # Normal Pallet
+        total_count = row * column * stack
+    else: # Rhombus Pallet
+        total_count = (row * column - int(row/2)) * stack
+
+    # wait_pos = trans(Global_pos5, [0, 0, 100, 0, 0, 0], DR_BASE, DR_BASE)
+    # Calculate Pallet Pose (Resulted in base coordinate)
+
+    for pallet_index in range(pallet_index, total_count):
+        Pallet_Pose = get_pattern_point(Global_pos1, Global_pos2, Global_pos3, Global_pos4, pallet_index, direction, row, column, stack, thickness, point_offset)
+
+        release()
+        movel(Pallet_Pose)
+        movel(posx(0, 0, -90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        grasp()
+        movel(posx(0, 0, 90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        movel(posx(200.4, 0, 0, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        movel(posx(0, 0, -90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        release()
+        movel(posx(0, 0, 90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+
+    for pallet_index2 in range(pallet_index2, total_count):
+        point_offset = [200.4, 0, 0]
+        Pallet_Pose = get_pattern_point(Global_pos1, Global_pos2, Global_pos3, Global_pos4, pallet_index2, direction, row, column, stack, thickness, point_offset)
+        # tp_popup("point={0}, index={1}".format(Pallet_Pose, pallet_index))
+        release()
+        # pos set
+
+        movel(Pallet_Pose)
+        movel(posx(0, 0, -90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        grasp()
+        movel(posx(0, 0, 90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        movel(posx(-200.4, 0, 0, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        movel(posx(0, 0, -90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+        release()
+        movel(posx(0, 0, 90, 0, 0, 0), ref = DR_BASE, mod = DR_MV_MOD_REL, a = 75, v = 75)
+
+    gLoop182438950 = gLoop182438950 + 1
+    break
